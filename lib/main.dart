@@ -38,7 +38,7 @@ class DPJI_App extends StatelessWidget {
       ),
 
       // home: LoginPage(),
-      routes: {'/chat': (context) => MainPage()},
+      routes: {'/mainpage': (context) => MainPage()},
       // home: ChatPage(),
     );
   }

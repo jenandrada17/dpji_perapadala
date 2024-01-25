@@ -1,28 +1,39 @@
-import 'package:dpji_perapadala/services/auth_service.dart';
 import 'package:dpji_perapadala/utils/spaces.dart';
 import 'package:dpji_perapadala/widgets/login_text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:social_media_buttons/social_media_button.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
   final _formkey = GlobalKey<FormState>();
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   Future<void> loginUser(BuildContext context) async {
-    if(_formkey.currentState!=null && _formkey.currentState!.validate()){
-      print(userNameController.text);
-      print(passwordController.text);
+    final response = await http.post(
+      Uri.parse('https://localhost:7071/api/validateLogin'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': userNameController.text,
+        'password': passwordController.text,
+      }),
+    );
 
-      await context.read<AuthService>().loginUser(userNameController.text);
-
-      // Navigator.pushNamed(context, '/chat', arguments: '${userNameController.text}');
-      Navigator.pushReplacementNamed(context, '/chat', arguments: '${userNameController.text}');
-      print('Login Successful!');
-    }else{
-      print('Login Unuccessful!');
+    if (response.statusCode == 200) {
+      // Authentication successful, handle the response
+      print('Authentication successful: ${response.body}');
+    } else if (response.statusCode == 401) {
+      // Unauthorized, handle the response (e.g., show error message)
+      print('Authentication failed. Invalid credentials');
+    } else if (response.statusCode == 404) {
+      // User not found, handle the response (e.g., show error message)
+      print('User not found');
+    } else {
+      // Handle other status codes as needed
+      print('Authentication failed. Status code: ${response.statusCode}');
     }
   }
 
@@ -100,9 +111,9 @@ class LoginPage extends StatelessWidget {
             onPressed: () async {
               await loginUser(context);
             },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.blue, // Change the background color here
-              padding: EdgeInsets.symmetric(horizontal: 80, vertical: 8), // Adjust padding here
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.blue), // Change the background color here
+              minimumSize: MaterialStateProperty.all(const Size(200, 40)), // Adjust width and height here
             ),
             child: const Text(
               'Login',
