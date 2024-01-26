@@ -40,7 +40,7 @@ class _ChatPageState extends State<MainPage> {
                 // Navigator.pushNamed(context, '/');
                 // Navigator.popAndPushNamed(context, '/');
                 Navigator.pushReplacementNamed(context, '/');
-                print('Icon pressed!');
+                print('Icon presseddd!');
               },
               icon: Icon(Icons.logout))
         ],
